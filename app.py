@@ -3,6 +3,8 @@ from posixpath import split
 from models import Base, session, Product, Brands, engine
 import datetime
 import csv
+import time
+from sqlalchemy import func, desc
 
 # ****************************** MENU 1 **************************************
 
@@ -99,7 +101,7 @@ def add_csv():
             brand_name = row[0]
             new_brand= Brands(brand_name=brand_name)
             session.add(new_brand)
-        session.commit()
+    session.commit()
 
     with open('inventory.csv') as csvfile:
         data_products = csv.reader(csvfile)
@@ -165,7 +167,7 @@ def app():
             session.add(new_product)
             session.commit()
             print(f'\n*** {name} has been added!***')
-
+            time.sleep(1.5)
 
         elif choice == "V":
             id_options = []
@@ -188,19 +190,25 @@ def app():
                   \rBrand ID: {the_product.brand_id}
 
                   ''')
-        
+            input('\nPress enter to return to the main menu.')
+
         elif choice == "A":
             least_expensive = session.query(Product).order_by(Product.product_price).first()
             most_expensive = session.query(Product).order_by(Product.product_price.desc()).first()
-            # common_brand = session.query(Product).filter(Product.product_id == product_id).first()
+            common_brand =  session.query(Product.brand_id, func.count(Product.product_id)).group_by(Product.brand_id).order_by(func.count(Product.brand_id).desc()).all()
+            brandID = (common_brand[0][0]-1)
+            print(brandID)
+            brands = ["Einstein's", "Kraft", "Bob's Red Mill", "Delish", "Kroger", "V8", "Campbell's", "Kikkoman", "Del Monte", "Farberware", "Pam", "McCormick","Chateau Bonnet"]
+            mostCommonBrand = brands[brandID]
 
             print(f'''\n*** Products Analysis ***
             \nThe most expensive product is: {most_expensive.product_name}
             \rThe price is: ${most_expensive.product_price/100}
             \nThe least expensive product is: {least_expensive.product_name}.
             \rThe price is: ${least_expensive.product_price/100}.''')
-            # print(f'\n The most common brand is: {common_brand.brand_name}.''')
-            
+            print(f'\n The most common brand is: {mostCommonBrand}''')
+            input('\nPress enter to return to the main menu.')
+
         elif choice == "B":
             # Backup the Database
             print(f'Backing up data ...')
