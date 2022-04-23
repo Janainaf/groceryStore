@@ -151,32 +151,33 @@ def app():
 
             date =  datetime.datetime.now().strftime('%m/%d/%Y/')
             date = clean_date(date)
-            brandId = input('''
-            \rPlease select a brand from the following:
-            \r1) Einstein's
-            \r2) Kraft
-            \r3) Bob's Red Mill
-            \r4) Delish 
-            \r5) Kroger
-            \r6) V8
-            \r7) Campbell's
-            \r8) Kikkoman 
-            \r9) Del Monte
-            \r10) Farberware
-            \r11) Pam
-            \r12) McCormick 
-            \r13) Chateau Bonnet
-            \rPlease choose the number for the corresponding brand or press X if the brand is not listed -  ''')
-            if brandId in ['1','2', '3', '4', '5', '6','7', '8', '9', '10',  '11', '12', '13']:
-                print(f'\n*** {name} has been added!***')
-            else:
-                print(f'\n*** no Brand added!***')
             
-            new_product = Product(product_name=name, product_quantity=quantity, product_price=price, date_updated=date, brand_id=brandId )
-            session.add(new_product)
-            session.commit()
-            print(f'\n*** {name} has been added!***')
-            time.sleep(1.5)
+            brand_error = True
+            while brand_error: 
+                brandId = input('''
+                    \rPlease select a brand from the following:
+                    \r1) Einstein's
+                    \r2) Kraft
+                    \r3) Bob's Red Mill
+                    \r4) Delish 
+                    \r5) Kroger
+                    \r6) V8
+                    \r7) Campbell's
+                    \r8) Kikkoman 
+                    \r9) Del Monte
+                    \r10) Farberware
+                    \r11) Pam
+                    \r12) McCormick 
+                    \r13) Chateau Bonnet
+                    \rPlease choose the number for the corresponding brand or press X if the brand is not listed -  ''')            
+                if brandId in ['1','2', '3', '4', '5', '6','7', '8', '9', '10',  '11', '12', '13', "X"]:
+                    new_product = Product(product_name=name, product_quantity=quantity, product_price=price, date_updated=date, brand_id=brandId )
+                    session.add(new_product)
+                    session.commit()
+                    print(f'\n*** {name} has been added!***')
+                    time.sleep(1.5)
+                    brand_error = False
+
 
         elif choice == "V":
             id_options = []
