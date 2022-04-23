@@ -1,7 +1,10 @@
+from calendar import month
+from posixpath import split
 from models import Base, session, Product, Brands, engine
 import datetime
 import csv
 
+# ****************************** MENU 1 **************************************
 
 def menu():
     while True:
@@ -22,18 +25,59 @@ def menu():
             \rPlease choose one of the option above
             \rPress Enter to try again''')
 
+            # ****************************** CLEANS DATA  **************************************
+
+def clean_price(price_string):
+    split_price= price_string.split('$')
+    float_price = float(split_price[1])
+    int_price =  int(float_price * 100)
+    return int_price
+
+def clean_date(date_str):
+    split_date = date_str.split('/')
+    year = int(split_date[2])
+    day = int(split_date[1])
+    month = int(split_date[0])
+    final_date = datetime.date(year, month, day)
+    return final_date
+
+def clean_quantity(quantity_string):
+    quantity_integer = int(quantity_string)
+    return quantity_integer
+
+
+
+def clean_brand(brand_str):
+    brands = ["Einstein's", "Kraft", "Bob's Red Mill", "Delish", "Kroger", "V8", "Campbell's", "Kikkoman", "Del Monte", "Farberware", "Pam", "McCormick","Chateau Bonnet"]
+    brand_id = brands.index(brand_str)
+    return brand_id
+
+
+# ****************************** READ CVS FILES **************************************
 def add_csv():
-    with open('brands.csv') as csvfile:
-        data_brands = csv.reader(csvfile)
-        for row in data_brands:
-            print(row)
+    # with open('brands.csv') as csvfile:
+    #     data_brands = csv.reader(csvfile)
+    #     for row in data_brands:
+    #         print(row)
+
     with open('inventory.csv') as csvfile:
         data_products = csv.reader(csvfile)
-        for row in data_products:
-            print(row)
+        next(data_products)
+        for row in data_products :
+            product_name = row[0]
+            product_price = clean_price(row[1])
+            product_quantity = clean_quantity(row[2])
+            date_updated = clean_date(row[3])
+            brand_id = clean_brand(row[4])
 
-def clean_data():
-    print("hello")
+            new_product = Product(product_name=product_name,
+            product_price=product_price, 
+            product_quantity=product_quantity, 
+            date_updated=date_updated, 
+            brand_id=brand_id), 
+            print(new_product)
+
+# ****************************** APP FUNCTION   **************************************
 
 def app():
     app_running = True
@@ -74,7 +118,13 @@ def app():
         else:
             print("Closing app... \nGoodbye :) ")
             app_running = False
+
+# ****************************** DUNDER DATA  **************************************
+
+
+
 if __name__ == '__main__':
     Base.metadata.create_all(engine)
-    app()
-    # add_csv()
+    # app()
+    add_csv()
+    
