@@ -157,8 +157,17 @@ def app():
             \r2) Kraft
             \r3) Bob's Red Mill
             \r4) Delish 
+            \r5) Kroger
+            \r6) V8
+            \r7) Campbell's
+            \r8) Kikkoman 
+            \r9) Del Monte
+            \r10) Farberware
+            \r11) Pam
+            \r12) McCormick 
+            \r13) Chateau Bonnet
             \rPlease choose the number for the corresponding brand or press X if the brand is not listed -  ''')
-            if brandId in ['1','2', '3', '4', '5', '6','7', '8', '9', '10', ]:
+            if brandId in ['1','2', '3', '4', '5', '6','7', '8', '9', '10',  '11', '12', '13']:
                 print(f'\n*** {name} has been added!***')
             else:
                 print(f'\n*** no Brand added!***')
@@ -210,10 +219,28 @@ def app():
             input('\nPress enter to return to the main menu.')
 
         elif choice == "B":
-            # Backup the Database
-            print(f'Backing up data ...')
+            print('Backing up data ...')
+            with open('Inventorybackup.csv', 'w') as csvfile:
+                fieldnames = ['product_id', 'product_name', 'product_price',
+                      'product_quantity', 'date_updated', 'brand_id']
+                enregister_product = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+                enregister_product.writeheader()
+                for product in session.query(Product).all():
+                    enregister_product.writerow({
+                        'product_id': product.product_id,
+                        'product_name': product.product_name,
+                        'product_price': (product.product_price/100),
+                        'product_quantity': product.product_quantity,
+                        'date_updated': product.date_updated,
+                        'brand_id': product.brand_id
+                    })
             print(f'\n*** Your database has been backed up!***')
-            pass
+            time.sleep(1.5)
+            input('\nPress enter to return to the main menu.')
+
+
+            
         else:
             print("Closing app... \nGoodbye :) ")
             app_running = False
