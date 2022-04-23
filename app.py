@@ -57,6 +57,8 @@ def clean_brand(brand_str):
 def add_csv():
     with open('brands.csv') as csvfile:
         data_brands = csv.reader(csvfile)
+        next(data_brands)
+
         for row in data_brands:
             brand_name = row[0]
             new_brand= Brands(brand_name=brand_name)
@@ -74,7 +76,7 @@ def add_csv():
                 product_price = clean_price(row[1])
                 product_quantity = clean_quantity(row[2])
                 date_updated = clean_date(row[3])
-                brand_id = clean_brand(row[4])
+                brand_id = (clean_brand(row[4])+1)
 
                 new_product = Product(product_name=product_name,
                 product_price=product_price, 
