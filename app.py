@@ -55,27 +55,34 @@ def clean_brand(brand_str):
 
 # ****************************** READ CVS FILES **************************************
 def add_csv():
-    # with open('brands.csv') as csvfile:
-    #     data_brands = csv.reader(csvfile)
-    #     for row in data_brands:
-    #         print(row)
+    with open('brands.csv') as csvfile:
+        data_brands = csv.reader(csvfile)
+        for row in data_brands:
+            brand_name = row[0]
+            new_brand= Brands(brand_name=brand_name)
+            session.add(new_brand)
+        session.commit()
 
     with open('inventory.csv') as csvfile:
         data_products = csv.reader(csvfile)
         next(data_products)
-        for row in data_products :
-            product_name = row[0]
-            product_price = clean_price(row[1])
-            product_quantity = clean_quantity(row[2])
-            date_updated = clean_date(row[3])
-            brand_id = clean_brand(row[4])
 
-            new_product = Product(product_name=product_name,
-            product_price=product_price, 
-            product_quantity=product_quantity, 
-            date_updated=date_updated, 
-            brand_id=brand_id), 
-            print(new_product)
+        for row in data_products :
+            product_in_db = session.query(Product).filter(Product.product_name == row[0]).one_or_none()
+            if product_in_db == None:
+                product_name = row[0]
+                product_price = clean_price(row[1])
+                product_quantity = clean_quantity(row[2])
+                date_updated = clean_date(row[3])
+                brand_id = clean_brand(row[4])
+
+                new_product = Product(product_name=product_name,
+                product_price=product_price, 
+                product_quantity=product_quantity, 
+                date_updated=date_updated, 
+                brand_id=brand_id) 
+                session.add(new_product)
+        session.commit()
 
 # ****************************** APP FUNCTION   **************************************
 
