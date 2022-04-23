@@ -106,20 +106,20 @@ def add_csv():
         next(data_products)
 
         for row in data_products :
-            product_in_db = session.query(Product).filter(Product.product_name == row[0]).one_or_none()
-            if product_in_db == None:
                 product_name = row[0]
                 product_price = clean_price(row[1])
                 product_quantity = clean_quantity(row[2])
                 date_updated = clean_date(row[3])
                 brand_id = (clean_brand(row[4])+1)
 
-                new_product = Product(product_name=product_name,
-                product_price=product_price, 
-                product_quantity=product_quantity, 
-                date_updated=date_updated, 
-                brand_id=brand_id) 
-                session.add(new_product)
+                product_in_db = session.query(Product).filter(Product.product_name == row[0]).one_or_none()
+                if product_in_db == None:
+                    new_product = Product(product_name=product_name,
+                    product_price=product_price, 
+                    product_quantity=product_quantity, 
+                    date_updated=date_updated, 
+                    brand_id=brand_id) 
+                    session.add(new_product)
     session.commit()
 
 # ****************************** APP FUNCTION   **************************************
@@ -128,6 +128,8 @@ def app():
     app_running = True
     while app_running:
         choice = menu()
+
+
         if choice == "N":
             name = input("What is the name of the product? " )
 
@@ -158,12 +160,14 @@ def app():
                 print(f'\n*** {name} has been added!***')
             else:
                 print(f'\n*** no Brand added!***')
+            
+            new_product = Product(product_name=name, product_quantity=quantity, product_price=price, date_updated=date, brand_id=brandId )
+            session.add(new_product)
+            session.commit()
+            print(f'\n*** {name} has been added!***')
+
 
         elif choice == "V":
-            # for product in session.query(Product):
-            #     print(f'\n{product.product_id} | {product.product_name} | ${product.product_price/100}')
-            # input('\nPress enter to return to the main menu.')
-
             id_options = []
             for product in session.query(Product):
                 id_options.append(product.product_id)
@@ -177,19 +181,26 @@ def app():
                     id_error = False
             the_product = session.query(Product).filter(Product.product_id == product_id).first()
             print(f'''
-                  \n{the_product.product_name} by {the_product.product_id}
+                  \n{the_product.product_id} | {the_product.product_name} 
                   \rDate Updated {the_product.date_updated}
                   \rCurrent Price: ${the_product.product_price/100}
+                  \rQuantity: ${the_product.product_quantity}
+                  \rBrand ID: {the_product.brand_id}
+
                   ''')
         
         elif choice == "A":
-            # Product Analysis
-            print(f'\n The most expensive product is: {product_name}.')
-            print(f'The price is: {product_price}.')
-            print(f'\n The most least product is: {product_name}.')
-            print(f'The price is: {product_price}.')
-            print(f'\n The most common brand is: {brand_name}.')
-            pass
+            least_expensive = session.query(Product).order_by(Product.product_price).first()
+            most_expensive = session.query(Product).order_by(Product.product_price.desc()).first()
+            # common_brand = session.query(Product).filter(Product.product_id == product_id).first()
+
+            print(f'''\n*** Products Analysis ***
+            \nThe most expensive product is: {most_expensive.product_name}
+            \rThe price is: ${most_expensive.product_price/100}
+            \nThe least expensive product is: {least_expensive.product_name}.
+            \rThe price is: ${least_expensive.product_price/100}.''')
+            # print(f'\n The most common brand is: {common_brand.brand_name}.''')
+            
         elif choice == "B":
             # Backup the Database
             print(f'Backing up data ...')
