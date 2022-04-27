@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Date, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
@@ -22,7 +22,7 @@ class Product(Base):
     product_name = Column("Name", String)
     product_quantity = Column("Quantity", Integer)
     product_price = Column("Price", Integer)
-    date_updated = Column("Date", Date)
+    date_updated = Column("Date", DateTime)
     brand_id = Column(Integer, ForeignKey("brands.brand_id"))
     brand = relationship("Brands", back_populates="products")
 

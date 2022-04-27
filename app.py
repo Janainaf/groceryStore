@@ -30,17 +30,32 @@ def menu():
  # ****************************** CLEAN DATA  **************************************
 
 def clean_price(price_string):
-    try:
+    if "$" in price_string:
         split_price= price_string.split('$')
-        float_price = float(split_price[1])
-        int_price =  int(float_price * 100)
-    except:
-            input('''
-                \n *** PRICE ERROR *** 
-                \n The price should be a number with a currency symbol $ 
-                \rPress Enter to try again''')
+        try:
+            float_price = float(split_price[1])
+        except ValueError:
+               input('''
+                    \n *** PRICE ERROR *** 
+                    \n The price should be a number - (Ex: 25.64)
+                    \rPress Enter to try again''')
+        else:
+                return int(float_price * 100)
+
     else:
-        return int_price
+        try:
+            float_price = float(price_string)
+            # int_price =  int(float_price * 100)
+
+        except:
+                input('''
+                    \n *** PRICE ERROR *** 
+                    \n The price should be a number - (Ex: 25.64)
+                    \rPress Enter to try again''')
+    
+
+        else:
+            return (int(float_price * 100))
 
 
 def clean_quantity(quantity_string):
@@ -55,11 +70,23 @@ def clean_quantity(quantity_string):
         return quantity_integer
 
 def clean_date(date_str):
-    split_date = date_str.split('/')
-    year = int(split_date[2])
-    day = int(split_date[1])
-    month = int(split_date[0])
-    final_date = datetime.date(year, month, day)
+    if ":" in date_str:
+        split_date = date_str.split('/')
+        time = split_date[3].split(':')
+        hour = int(time[0])
+        minutes = int(time[1])
+        second = int(time[2])
+        year = int(split_date[2])
+        day = int(split_date[1])
+        month = int(split_date[0])
+        final_date = datetime.datetime(year, month, day, hour, minutes, second)
+
+    else:
+            split_date = date_str.split('/')
+            year = int(split_date[2])
+            day = int(split_date[1])
+            month = int(split_date[0])
+            final_date = datetime.datetime(year, month, day)
     return final_date
 
 
@@ -144,12 +171,12 @@ def app():
 
             price_error = True
             while price_error: 
-                price = input("How much is the product? (Ex: $25.64) - " )
+                price = input("How much is the product? (Ex: 25.64) - " )
                 price = clean_price(price)
                 if type(price) == int:
                     price_error = False
 
-            date =  datetime.datetime.now().strftime('%m/%d/%Y/')
+            date =  datetime.datetime.now().strftime('%m/%d/%Y/ %H:%M:%S')
             date = clean_date(date)
             
             brand_error = True
@@ -196,7 +223,7 @@ def app():
                   \n{the_product.product_id} | {the_product.product_name} 
                   \rDate Updated {the_product.date_updated}
                   \rCurrent Price: ${the_product.product_price/100}
-                  \rQuantity: ${the_product.product_quantity}
+                  \rQuantity: {the_product.product_quantity}
                   \rBrand ID: {the_product.brand_id}
 
                   ''')
@@ -248,9 +275,10 @@ def app():
 
 # ****************************** DUNDER DATA  **************************************
 
+
+    
 if __name__ == '__main__':
     Base.metadata.create_all(engine)
     add_csv()
     app()
-   
-    
+    # print(clean_price("kugh"))
